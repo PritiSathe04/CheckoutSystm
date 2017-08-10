@@ -1,0 +1,58 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Checkoutsystem.Interfaces;
+using Checkoutsystem.Products;
+
+namespace Checkoutsystem
+{
+    public class CheckoutSystem
+    {
+        /*
+         * Checkout('apple,orange,apple,apple,plums')
+         */
+        public static CheckoutObject Checkout(string productsAsString)
+        {
+            var products = productsAsString.Split(',');
+
+            if (string.IsNullOrEmpty(productsAsString))
+            {
+                return new CheckoutObject { CheckoutTotal = 0 };
+            }
+
+            var productsInBasket = new List<IProduct>();
+            var invalidProducts = new List<string>();
+            var errors = string.Empty; // or var errors = "";
+
+            foreach (var product in products)
+            {
+                switch (product.ToLower().Trim())
+                {
+                    case "apple":
+                        productsInBasket.Add(new Apple());
+                        break;
+                    case "orange":
+                        productsInBasket.Add(new Orange());
+                        break;
+                    default:
+                        invalidProducts.Add(product);
+                        break;
+                }
+            }
+
+            if (invalidProducts.Count > 0)
+            {
+                errors = string.Format("The following products are not defined in our store: {0}",
+                    string.Join(", ", invalidProducts));
+            }
+
+            return new CheckoutObject
+            {
+                CheckoutTotal = productsInBasket.Sum(product => product.GetProductPrice()),
+                Errors = errors
+            };
+        }
+    }
+}

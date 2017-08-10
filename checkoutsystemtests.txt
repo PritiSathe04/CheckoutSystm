@@ -1,0 +1,48 @@
+using System;
+using Checkoutsystem;
+
+using NUnit.Framework;
+
+namespace checkoutsystem.tests
+{
+    [TestFixture]
+    public class CheckoutsystemTests
+    {
+        [Test]
+        public void BasketTotalIsZero_When_ThereAreNoProductsInBasket()
+        {
+            var checkout = CheckoutSystem.Checkout("");
+
+            Assert.AreEqual(0, checkout.CheckoutTotal, "Error in Checkout Total");
+            Assert.AreEqual(null, checkout.Errors, "Input Products are null");
+        }
+
+        [TestCase("apple", 0.60)]
+        [TestCase("orange", 0.25)]
+        [TestCase("apple,orange", 0.85)]
+        [TestCase("apple,apple,orange", 1.45)]
+        [TestCase("apple,orange,apple,orange", 1.70)]
+        [TestCase("apple , orange , apple , orange", 1.70)]
+        [TestCase("Apple , Orange , APPLE , ORANGE", 1.70)]
+        public void BasketTotalIsCalculatedCorrect_When_DifferentValidProductsAreAdded(string inputProductsAsString, decimal totalExpected)
+        {
+            var checkout = CheckoutSystem.Checkout(inputProductsAsString);
+
+            Assert.AreEqual(totalExpected, checkout.CheckoutTotal, "Error in Checkout Total");
+            Assert.AreEqual(string.Empty, checkout.Errors, "Input string is empty");
+        }
+
+        [TestCase("Plum", "The following products are not defined in our store: Plum", 0)]
+        [TestCase("apple,Plum", "The following products are not defined in our store: Plum", 0.60)]
+        [TestCase("apple,Plum,Plum", "The following products are not defined in our store: Plum, Plum", 0.60)]
+        [TestCase("Oragne, apple,Plum,Orange,Plum,£$%", "The following products are not defined in our store: Oragne, Plum, Plum, £$%", 1.10)]
+        public void BasketTotalIsCalulated_When_BasketContainsInvalidProductOrInputString(
+            string inputProductsAsString, string expectedErrorMessage, decimal totalExpected)
+        {
+            var checkout = CheckoutSystem.Checkout(inputProductsAsString);
+
+            Assert.AreEqual(totalExpected, checkout.CheckoutTotal, "Total is incorrct due to invalid product");
+            Assert.AreEqual(expectedErrorMessage, checkout.Errors, "Error message is incorrect for invalid product");
+        }
+    }
+}

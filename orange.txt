@@ -1,0 +1,25 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Checkoutsystem.Interfaces;
+
+namespace Checkoutsystem.Products
+{
+    public class Orange : IProduct
+    {
+        private const string ProductName = "Orange";
+        private const decimal ProductPrice = (decimal) 0.25;
+
+        public string GetProductName()
+        {
+            return ProductName;
+        }
+
+        public decimal GetProductPrice()
+        {
+            return ProductPrice;
+        }
+    }
+}
